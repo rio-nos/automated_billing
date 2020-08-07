@@ -10,6 +10,6 @@ About:
 The idea was that I could have this python script log-in into each of the bill's websites, retrieve the balance, calculate each individual's share of the bill,
 then apply this amount to each individual's stored credit card and pay the bills.
 
-Libraries used: Selenium
-Driver used: Chrome
+Libraries used: Selenium.
+Driver used: Chrome.
 

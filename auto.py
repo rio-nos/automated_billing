@@ -1,6 +1,7 @@
 from selenium import webdriver
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotInteractableException
-from secrets import cuser, cpass, suser, spass, puser, ppass, xuser, xpass, tuser, tpass
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotInteractableException, \
+    ElementClickInterceptedException
+from secrets import cuser, cpass, suser, spass, puser, ppass, psc, xuser, xpass, tuser, tpass
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -124,9 +125,12 @@ class SuburbanGarbage:
         try:
             self.driver.get('https://secure.myonlinebill.com/mob/user/login.do?clientId=MTA4OTY=')
             sleep(1)
-            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="userId"]'))).send_keys(self.username)
-            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="password"]'))).send_keys(self.password)
-            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="signInBtn"]'))).click()
+            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="userId"]'))).send_keys(self.username)
+            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="password"]'))).send_keys(self.password)
+            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="signInBtn"]'))).click()
         except NoSuchElementException:
             print("NoSuchElementException occurred. Exiting...")
             self.driver.close()
@@ -146,7 +150,8 @@ class SuburbanGarbage:
             except TimeoutException:
                 print("Nested TimeoutException occurred. Executing finally block.")
             finally:
-                balance = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="billTable"]/tbody/tr/td[4]/ul/li')))
+                balance = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="billTable"]/tbody/tr/td[4]/ul/li')))
                 self.balance = float(balance.text.strip()[1:])
         except NoSuchElementException:
             print("NoSuchElementException occurred. Exiting...")
@@ -185,23 +190,33 @@ class SuburbanGarbage:
         try:
             # Edit to self.individuals, change select_by_index for paymentType.
             for i in range(0, self.individuals - 4):
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="payNowLink"]'))).click()
-                paymentBox = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="amount"]')))
+                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="payNowLink"]'))).click()
+                paymentBox = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="amount"]')))
                 paymentBox.clear()
                 paymentBox.send_keys(str(0.01))
 
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="endUserPaymentForm"]/div[3]/div/div/button'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="endUserPaymentForm"]/div[3]/div/div/div/ul/li[2]/a'))).click()
+                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="endUserPaymentForm"]/div[3]/div/div/button'))).click()
+                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="endUserPaymentForm"]/div[3]/div/div/div/ul/li[2]/a'))).click()
                 sleep(1)
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="endUserPaymentForm"]/div[7]/div/div/button'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="endUserPaymentForm"]/div[7]/div/div/div/ul/li[3]/a'))).click()
+                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="endUserPaymentForm"]/div[7]/div/div/button'))).click()
+                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="endUserPaymentForm"]/div[7]/div/div/div/ul/li[3]/a'))).click()
                 sleep(1)
                 # Click 'Yes, I agree' button.
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div[2]/div/label[1]'))).click()
+                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div[2]/div/label[1]'))).click()
                 # Click 'Next' button to continue.
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="paymentBtn"]'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="paymentProcessBtn"]'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="doneBtn"]'))).click()
+                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="paymentBtn"]'))).click()
+                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="paymentProcessBtn"]'))).click()
+                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="doneBtn"]'))).click()
                 sleep(10)
         except ElementNotInteractableException:
             print("ElementNotInteractableException. Exiting...")
@@ -218,11 +233,12 @@ class SuburbanGarbage:
 
 
 class PortlandGeneralElectric:
-    def __init__(self, username, password):
+    def __init__(self, username, password, sc):
         self.login_timeout = 10
         self.dashboard_timeout = 20
         self.username = username
         self.password = password
+        self.psc = sc
         self.individuals = 5
         self.balance = None
         self.pay = None
@@ -231,10 +247,14 @@ class PortlandGeneralElectric:
     def login(self):
         try:
             self.driver.get('https://new.portlandgeneral.com/auth/sign-in')
-            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div[3]/div/div[3]/button'))).click()
-            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="login-form"]/div[1]/div/div/input'))).send_keys(self.username)
-            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="login-form"]/div[2]/div/div/input'))).send_keys(self.password)
-            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="login-form"]/div[3]/div/div[2]/button/span'))).submit()
+            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '/html/body/div[2]/div[3]/div/div[3]/button'))).click()
+            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="login-form"]/div[1]/div/div/input'))).send_keys(self.username)
+            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="login-form"]/div[2]/div/div/input'))).send_keys(self.password)
+            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="login-form"]/div[3]/div/div[2]/button/span'))).submit()
         except TimeoutException:
             print("TimeoutException occurred. Exiting...")
             self.driver.close()
@@ -242,10 +262,10 @@ class PortlandGeneralElectric:
 
     def get_balance(self):
         try:
-            balance = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="full-height-shim"]/div[3]/div/div/div/div/div/div/div/div[4]/div/div/div')))
-            self.balance = float(balance.text.split()[4][1:])
+            balance = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="full-height-shim"]/div[4]/div/div/div[2]/div/div[3]/div/div/div[4]/div/div[1]/div/div/div/div[2]/div/div[1]/div/div[2]/h2')))
+            self.balance = float(balance.text[1:])
             print(self.balance)
-            sleep(15)
         except NoSuchElementException:
             print("NoSuchElementException occurred. Exiting...")
             self.driver.close()
@@ -262,10 +282,8 @@ class PortlandGeneralElectric:
             print("Extra credit on balance amount. We have paid more than is required on the bill! Excellent :)")
         else:
             print("Your balance is: {}".format(self.balance))
-            sleep(1)
             self.pay = ceil((self.balance / self.individuals) * 100) / 100.0
             print("Each person will pay: {}".format(self.pay))
-            sleep(1)
             while(True):
                 confirm = input("Confirm? [Y/N]: ").strip()
                 if confirm in ["Y", "y"]:
@@ -279,29 +297,47 @@ class PortlandGeneralElectric:
                     continue
         return 1
 
-
     def make_payment(self):
         try:
-            # Edit to self.individuals, change select_by_index for paymentType.
-            for i in range(0, self.individuals - 4):
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="payNowLink"]'))).click()
-                paymentBox = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="amount"]')))
-                paymentBox.clear()
-                paymentBox.send_keys(str(0.01))
+            # 'Pay Bill' button
+            sleep(1)
+            WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="full-height-shim"]/div[4]/div/div/div[2]/div/div[1]/div/button[3]'))).click()
+            # 'Credit Card' button
+            WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="scrollable-force-tab-1"]'))).send_keys('\n')
+            # 'Pay using billmatrix' button
+            WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="tabpanel-1"]/div/div[3]/button'))).send_keys('\n')
 
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="endUserPaymentForm"]/div[3]/div/div/button'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="endUserPaymentForm"]/div[3]/div/div/div/ul/li[2]/a'))).click()
-                sleep(1)
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="endUserPaymentForm"]/div[7]/div/div/button'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="endUserPaymentForm"]/div[7]/div/div/div/ul/li[3]/a'))).click()
-                sleep(1)
-                # Click 'Yes, I agree' button.
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div[2]/div/label[1]'))).click()
-                # Click 'Next' button to continue.
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="paymentBtn"]'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="paymentProcessBtn"]'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="doneBtn"]'))).click()
-                sleep(10)
+            WebDriverWait(self.driver, self.dashboard_timeout).until(EC.number_of_windows_to_be(2))
+            self.driver.switch_to.window(self.driver.window_handles[1])
+
+            # Make payments
+            for i in range(0, self.individuals - 4):
+                paymentBox = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="PaymentInfoList_0__PaymentAmount"]')))
+                paymentBox.clear()
+                paymentBox.send_keys(str(5.00))
+
+                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="PaymentInfoList_0__SelectedPaymentCategoryKey"]'))).click()
+                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="Visa *Chase Nene_0"]'))).click()
+
+                sec_code = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '/html/body/section/form/section/div[2]/div/div/section/div[1]/div[1]/div[4]/div[2]/div/div/div/span[1]/input')))
+                sec_code.send_keys(self.psc["Nos"])
+                # WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                #     (By.XPATH, '//*[@id="Visa *Chase Nene_0"]'))).click()
+                # "Continue" payment, for submitting payment.
+
+
+            sleep(100)
+        except ElementClickInterceptedException:
+            print("ElementClickInterceptedException. Exiting...")
+            self.driver.close()
+            self.driver.quit()
         except ElementNotInteractableException:
             print("ElementNotInteractableException. Exiting...")
             self.driver.close()
@@ -332,9 +368,12 @@ class Xfinity:
     def login(self):
         try:
             self.driver.get('https://customer.xfinity.com/#/billing')
-            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="user"]'))).send_keys(self.username)
-            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="passwd"]'))).send_keys(self.password)
-            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sign_in"]'))).submit()
+            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="user"]'))).send_keys(self.username)
+            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="passwd"]'))).send_keys(self.password)
+            WebDriverWait(self.driver, self.login_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="sign_in"]'))).submit()
         except TimeoutException:
             print("TimeoutException occurred. Exiting...")
             self.driver.close()
@@ -350,7 +389,8 @@ class Xfinity:
             except TimeoutException:
                 print("Nested TimeoutException occurred. Executing finally block.")
             finally:
-                balance = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="page-view"]/section[2]/div/div/div[1]/div[1]/div/div[2]/div[1]/div/div/table/tbody/tr/td[2]/span')))
+                balance = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="page-view"]/section[2]/div/div/div[1]/div[1]/div/div[2]/div[1]/div/div/table/tbody/tr/td[2]/span')))
                 self.balance = float(balance.text[1:])
                 print(self.balance)
         except NoSuchElementException:
@@ -388,8 +428,10 @@ class Xfinity:
 
     def make_payment(self):
         try:
-            WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="page-view"]/section[2]/div/div/div[1]/div[1]/div/div[2]/div[1]/div/div/div/div[1]/a'))).click()
-            WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="page-main"]/div/div/div/form/div[1]/div/div[2]/div/div[1]/div/div/label'))).click()
+            WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="page-view"]/section[2]/div/div/div[1]/div[1]/div/div[2]/div[1]/div/div/div/div[1]/a'))).click()
+            WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="page-main"]/div/div/div/form/div[1]/div/div[2]/div/div[1]/div/div/label'))).click()
 
             payBox = self.driver.find_element_by_xpath('//*[@id="customAmount"]')
             payBox.clear()
@@ -407,7 +449,6 @@ class Xfinity:
             print(cards)
             # Make a payment. Eliminate previously used method. Check if remaining cards are on the webpage.
             WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="page-main"]/div/div/div/form/div[4]/div[1]/button'))).click()
-            # WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="page-main"]/div/div/div/form/div[3]/div[1]/button'))).click()
 
             # Xfinity tends to not load all stored payments. Find one that we haven't used yet. Eliminate. Repeat.
             while(True):
@@ -536,7 +577,7 @@ def call_choices(choices):
             s.validate()
         if choice == 3:
             # Pay Portland General Electric account.
-            p = PortlandGeneralElectric(puser, ppass)
+            p = PortlandGeneralElectric(puser, ppass, psc)
             p.login()
             p.get_balance()
             p.validate()
@@ -570,7 +611,7 @@ def main():
             print("Unable to convert input to integers")
             continue
 
-        if all(0 < choice <= 4 for choice in choices):
+        if all(0 < choice <= 5 for choice in choices):
             print("Thanks!")
             call_choices(choices)
             break

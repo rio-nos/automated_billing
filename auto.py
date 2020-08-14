@@ -1,14 +1,20 @@
-from selenium import webdriver
+from secrets import cuser, cpass, suser, spass, puser, ppass, psc, xuser, xpass, tuser, tpass
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotInteractableException, \
     ElementClickInterceptedException
-from secrets import cuser, cpass, suser, spass, puser, ppass, psc, xuser, xpass, tuser, tpass
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium import webdriver
 from time import sleep
 from math import ceil
 
+
+chrome_options = Options()
+chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+chrome_options.add_argument('--log-level=3')
 drive_path = './chromedriver.exe'
 
 
@@ -116,10 +122,10 @@ class SuburbanGarbage:
         self.dashboard_timeout = 20
         self.username = username
         self.password = password
-        self.individuals = 5
+        self.individuals = 6
         self.balance = None
         self.pay = None
-        self.driver = webdriver.Chrome(drive_path)
+        self.driver = webdriver.Chrome(drive_path, options=chrome_options)
 
     def login(self):
         try:
@@ -168,11 +174,9 @@ class SuburbanGarbage:
         elif self.balance < 0.0:
             print("Extra credit on balance amount. We have paid more than is required on the bill! Excellent :)")
         else:
-            print("Your balance is: {}".format(self.balance))
-            sleep(1)
+            print("\nYour balance is: {}".format(self.balance))
             self.pay = ceil((self.balance / self.individuals) * 100) / 100.0
             print("Each person will pay: {}".format(self.pay))
-            sleep(1)
             while(True):
                 confirm = input("Confirm? [Y/N]: ").strip()
                 if confirm in ["Y", "y"]:
@@ -189,7 +193,7 @@ class SuburbanGarbage:
     def make_payment(self):
         try:
             # Edit to self.individuals, change select_by_index for paymentType.
-            for i in range(0, self.individuals - 4):
+            for i in range(1, self.individuals):
                 WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
                     (By.XPATH, '//*[@id="payNowLink"]'))).click()
                 paymentBox = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
@@ -197,27 +201,23 @@ class SuburbanGarbage:
                 paymentBox.clear()
                 paymentBox.send_keys(str(0.01))
 
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="endUserPaymentForm"]/div[3]/div/div/button'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="endUserPaymentForm"]/div[3]/div/div/div/ul/li[2]/a'))).click()
-                sleep(1)
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="endUserPaymentForm"]/div[7]/div/div/button'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="endUserPaymentForm"]/div[7]/div/div/div/ul/li[3]/a'))).click()
-                sleep(1)
+                paymentOption = Select(WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="paymentTime"]'))))
+                paymentOption.select_by_index(1)
+                paymentType = Select(WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="paymentOption"]'))))
+                paymentType.select_by_index(i)
+
                 # Click 'Yes, I agree' button.
                 WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
                     (By.XPATH, '/html/body/div[1]/div[2]/div[1]/div/div/div[2]/div/label[1]'))).click()
                 # Click 'Next' button to continue.
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="paymentBtn"]'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="paymentProcessBtn"]'))).click()
-                WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="doneBtn"]'))).click()
-                sleep(10)
+                # WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    # (By.XPATH, '//*[@id="paymentBtn"]'))).click()
+                # WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                #     (By.XPATH, '//*[@id="paymentProcessBtn"]'))).click()
+                # WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                #     (By.XPATH, '//*[@id="doneBtn"]'))).click()
         except ElementNotInteractableException:
             print("ElementNotInteractableException. Exiting...")
             self.driver.close()
@@ -235,7 +235,7 @@ class SuburbanGarbage:
 class PortlandGeneralElectric:
     def __init__(self, username, password, sc):
         self.login_timeout = 10
-        self.dashboard_timeout = 20
+        self.dashboard_timeout = 30
         self.username = username
         self.password = password
         self.psc = sc
@@ -262,10 +262,18 @@ class PortlandGeneralElectric:
 
     def get_balance(self):
         try:
-            balance = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                (By.XPATH, '//*[@id="full-height-shim"]/div[4]/div/div/div[2]/div/div[3]/div/div/div[4]/div/div[1]/div/div/div/div[2]/div/div[1]/div/div[2]/h2')))
-            self.balance = float(balance.text[1:])
-            print(self.balance)
+            ret = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                (By.TAG_NAME, 'h2')))
+            if ret is None:
+                print('Did not find h2 elements.')
+                self.driver.close()
+                self.driver.quit()
+                return 0
+            else:
+                h2_tags = self.driver.find_elements_by_tag_name('h2')
+                self.balance = float(h2_tags[0].text[1:])
+                print(self.balance)
+
         except NoSuchElementException:
             print("NoSuchElementException occurred. Exiting...")
             self.driver.close()
@@ -284,6 +292,7 @@ class PortlandGeneralElectric:
             print("Your balance is: {}".format(self.balance))
             self.pay = ceil((self.balance / self.individuals) * 100) / 100.0
             print("Each person will pay: {}".format(self.pay))
+
             while(True):
                 confirm = input("Confirm? [Y/N]: ").strip()
                 if confirm in ["Y", "y"]:
@@ -300,9 +309,13 @@ class PortlandGeneralElectric:
     def make_payment(self):
         try:
             # 'Pay Bill' button
-            sleep(1)
-            WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                (By.XPATH, '//*[@id="full-height-shim"]/div[4]/div/div/div[2]/div/div[1]/div/button[3]'))).click()
+            buttons = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_all_elements_located(
+                (By.TAG_NAME, 'button')))
+            for b in buttons:
+                b_text = b.text.strip()
+                if b_text == 'Pay Bill':
+                    b.send_keys('\n')
+                    break
             # 'Credit Card' button
             WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
                 (By.XPATH, '//*[@id="scrollable-force-tab-1"]'))).send_keys('\n')
@@ -313,27 +326,53 @@ class PortlandGeneralElectric:
             WebDriverWait(self.driver, self.dashboard_timeout).until(EC.number_of_windows_to_be(2))
             self.driver.switch_to.window(self.driver.window_handles[1])
 
+            # Select payment categories.
+            WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="PaymentInfoList_0__SelectedPaymentCategoryKey"]'))).click()
+            # Retrieve wallet.
+            wallet = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="Ul_0"]')))
+            print(wallet.text)
+            cards = wallet.text.split('\n')
+            print(cards)
+
+            self.driver.ActionChains(self.driver).send_keys(Keys.ESCAPE).perform()
+
             # Make payments
-            for i in range(0, self.individuals - 4):
-                paymentBox = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+            for card in cards:
+                pay_amount = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
                     (By.XPATH, '//*[@id="PaymentInfoList_0__PaymentAmount"]')))
-                paymentBox.clear()
-                paymentBox.send_keys(str(5.00))
+                pay_amount.clear()
+                pay_amount.send_keys('5.00')
 
                 WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
                     (By.XPATH, '//*[@id="PaymentInfoList_0__SelectedPaymentCategoryKey"]'))).click()
                 WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="Visa *Chase Nene_0"]'))).click()
+                    (By.ID, card + '_0'))).click()
 
-                sec_code = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                    (By.XPATH, '/html/body/section/form/section/div[2]/div/div/section/div[1]/div[1]/div[4]/div[2]/div/div/div/span[1]/input')))
-                sec_code.send_keys(self.psc["Nos"])
+                security_code = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="PaymentInfoList_0__CardWallet_SecurityCode"]')))
+                security_code.send_keys(self.psc[card.split()[-1]])
+                sleep(15)
+
+                # 'Continue' button.
                 # WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
-                #     (By.XPATH, '//*[@id="Visa *Chase Nene_0"]'))).click()
-                # "Continue" payment, for submitting payment.
+                #     (By.XPATH, '//*[@id="btnPayNow_Continue"]'))).send_keys('\n')
 
+                # Retrieve current url before submitting payment.
+                # current_url = self.driver.current_url
 
-            sleep(100)
+                # 'Pay' button.
+                # WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located(
+                    # (By.XPATH, '//*[@id="btnReview_Pay"]'))).send_keys('\n')
+
+                # Wait until confirmation page is done loading before starting another payment.
+                # WebDriverWait(self.driver, self.dashboard_timeout).until(EC.url_changes(current_url))
+
+                # Return to the payment information page to process the next payment.
+                # self.driver.get('https://webpayments.billmatrix.com/PGEfp/Payment/paymentinformation')
+
+            sleep(500)
         except ElementClickInterceptedException:
             print("ElementClickInterceptedException. Exiting...")
             self.driver.close()
@@ -523,7 +562,6 @@ class TMobile:
                 balance = WebDriverWait(self.driver, self.dashboard_timeout).until(EC.presence_of_element_located((By.XPATH, '//*[@id="maincontent"]/app-home/div/div/div/app-postpaid-home/tmo-billing/div/div[1]/div/div[3]/div[2]/span')))
                 self.balance = float(balance.text.strip().replace(" ", "")[1:])
                 print(self.balance)
-                sleep(10)
         except NoSuchElementException:
             print("NoSuchElementException occurred. Exiting...")
             self.driver.close()
@@ -592,8 +630,7 @@ def call_choices(choices):
             t = TMobile(tuser, tpass)
             t.login()
             t.get_balance()
-            # t.make_payment()
-
+            t.validate()
 
 def main():
     print("\n\nWhat do you want to pay?\n")

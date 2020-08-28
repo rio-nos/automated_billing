@@ -6,11 +6,12 @@ Date: August, 7th, 2020
 
 About:
 
-	This project was motivated with the idea that I did not want to have to manually pay each individual's fair share of the bill.
-The idea was that I could have this python script log-in into each of the bill's websites, retrieve the balance, calculate each individual's share of the bill,
-then apply this amount to each individual's stored credit card and pay the bills.
+	This project was motivated (ironically) with the idea that I did not want to manually pay each individual's fair share of the bill. I gave up most of my responsibility on overseeing the bills to an automated python script.
+The idea was that I could have this python script login to each websites pertaining to a service, retrieve the bill's balance, calculate each individual's share of the bill,
+then apply the amount to each card and pay the bill.
 
 Libraries used: Selenium.
+
 Driver used: Chrome.
 
 A "secrets.py" file was imported to retrieve user log-in information to be able to log-in into the websites. 

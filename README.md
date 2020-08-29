@@ -4,6 +4,9 @@ Author: Nosorio Liberato
 
 Date: August, 7th, 2020
 
+Timeframe: This project took roughly 40 hours to complete. The amount time spent on this project consisted mostly of learning
+	how to use the Selenium library, planning what data types to use to store variables, and implementing an efficient algorithm.
+
 About:
 
 	This project was motivated with the idea that I did not have the motivation to manually pay each individual's fair share of the bill. I gave up most of my responsibility on overseeing the bills for 6 individuals in our house and gave most of the responsibility to my automated python script.

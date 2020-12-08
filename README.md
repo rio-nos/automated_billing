@@ -9,7 +9,7 @@ Timeframe: This project took roughly 40 hours to complete. The amount time spent
 
 About:
 
-	This project was motivated with the idea that I did not have the motivation to manually pay each individual's fair share of the bill. I gave up most of my responsibility on overseeing the bills for 6 individuals in our house and gave most of the responsibility to my automated python script.
+	This project was motivated with the idea that I did not have the motivation to manually pay each individual's fair share of the bill. I gave up most of my responsibility on overseeing the bills for 6 individuals in our house and gave gave it to this python script.
 The idea was that I could have this python script login to each websites pertaining to a service, retrieve the bill's balance, calculate each individual's share of the bill,
 then apply the amount to each card and pay the bill.
 

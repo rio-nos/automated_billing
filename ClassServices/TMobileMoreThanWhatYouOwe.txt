@@ -1,0 +1,20 @@
+Element:
+
+<button ng-click="vm.accept(vm.authorValues.otpAlertModalHeaderLabel,'continueAmountAlert')" 
+class="btn btn-primary padding-bottom-large button-title PrimaryCTA no-padding width-md 
+glueButton gluePull-left-sm ng-binding">Yes, pay it</button>
+
+CSS Selector:
+
+#continueAmountAlert > button
+
+XPath:
+
+
+//*[@id="continueAmountAlert"]/button
+
+
+Full Xpath:
+
+
+/html/body/div[1]/div/div/div/div/div[2]/div/div[3]/div[1]/button
